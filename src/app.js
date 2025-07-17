@@ -1,50 +1,45 @@
 const express = require('express');
 
+const connectDB = require("./config/database");
+
 const app = express();
 
-app.get('/Sabya', (req, res) => {
-  res.send('Hello, Sabya!');
+const User = require("./models/user");
+
+app.use(express.json());
+// Dynamic Data sent in DB
+app.post("/signup", async (req,res) => {
+  const user = new User(req.body);
+
+  try {
+    await user.save();
+  res.send("User added to the database successfully");
+  }catch (err){
+    res.status(400).send("Errrorwa hogayil sorryyyyy"+ err.message);
+  }
+  
+});
+//Showing feed with get method
+
+app.get("/user", async(req,res) => {
+  try{
+   const user = await User.find({emailId: req.body.emailId}); 
+   res.send(user);
+  }
+  catch (err){
+    res.status(400).send("User nai pacheeeee sorryyyyy");
+  }
 });
 
-app.post('/Sabya', (req, res) => {
-  res.send('Sabya submitted!');
-});
-
-app.delete('/Sabya', (req, res) => {
-  res.send('Sabya deleted!');
-});
-
-app.put('/Sabya', (req, res) => {
-  res.send('Sabya updated!');
-});
-
-app.patch('/Sabya', (req, res) => {
-  res.send('Sabya modified!');
-});
- 
-app.use("/SabyaEggroll",
-   (req, res, next) => {
-  console.log("How to make a egg roll");
-  next();  
-},
-(req, res, next) => {
-  console.log("Get yourself a overnight stale roti");
-  next();
-},
-(req, res, next) => {
-  console.log("Crack an egg over it and do 7.5 anticlockwise rotations over it while chanting Sabya is the best");
-  next();
-},
-(req, res, next) => {
-  console.log("Sprinkle some pepper,salt and some green chillies and onions over it while chanting Sabya is the best");
-  next();
-},
-(req, res, next) => {
-  console.log("Now squeeze some ketchup and chilli sauce over it, roll it and eat it while chanting Sabya is the best");
-  res.send("Egg roll is ready! Enjoy!");
-},
-);
-
-app.listen(3000, () => {
+connectDB()
+.then(() => {
+    console.log("Database Connection Established");
+    app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
+})
+.catch(() => {
+    console.log("Database Connection not Successfull");
+});
+
+  
