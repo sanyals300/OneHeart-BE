@@ -1,35 +1,20 @@
 const express = require('express');
-
 const connectDB = require("./config/database");
-
 const app = express();
-
-const User = require("./models/user");
+const cookieParser = require("cookie-parser"); 
 
 app.use(express.json());
-// Dynamic Data sent in DB
-app.post("/signup", async (req,res) => {
-  const user = new User(req.body);
+app.use(cookieParser());
 
-  try {
-    await user.save();
-  res.send("User added to the database successfully");
-  }catch (err){
-    res.status(400).send("Errrorwa hogayil sorryyyyy"+ err.message);
-  }
-  
-});
-//Showing feed with get method
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
-app.get("/user", async(req,res) => {
-  try{
-   const user = await User.find({emailId: req.body.emailId}); 
-   res.send(user);
-  }
-  catch (err){
-    res.status(400).send("User nai pacheeeee sorryyyyy");
-  }
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+
+
 
 connectDB()
 .then(() => {
