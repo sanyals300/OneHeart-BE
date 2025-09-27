@@ -1,8 +1,19 @@
-const express = require('express');
+const cors = require("cors");
+const express = require("express");
 const connectDB = require("./config/database");
+const cookieParser = require("cookie-parser");
 const app = express();
-const cookieParser = require("cookie-parser"); 
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -14,19 +25,15 @@ const userRouter = require("./routes/user");
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
-app.use("/",userRouter);
-
-
+app.use("/", userRouter);
 
 connectDB()
-.then(() => {
+  .then(() => {
     console.log("Database Connection Established");
     app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
-});
-})
-.catch(() => {
+      console.log("Server is running on http://localhost:3000");
+    });
+  })
+  .catch(() => {
     console.log("Database Connection not Successfull");
-});
-
-  
+  });

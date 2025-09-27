@@ -1,31 +1,28 @@
-const cookieParser = require("cookie-parser"); 
+const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-const userAuth = async (req,res,next) => {
-
-   try {
+const userAuth = async (req, res, next) => {
+  try {
     const { token } = req.cookies;
 
-    if(!token){
-        throw new Error("Token is not valid");
+    if (!token) {
+      return res.status(401).send("Please Login");
     }
-    
-    const decodedObject = await jwt.verify(token,"OneHeart@832303");
+
+    const decodedObject = await jwt.verify(token, "OneHeart@832303");
 
     const { _id } = decodedObject;
 
     const user = await User.findById(_id);
-    if(!user){
-        throw new Error("No user found");
+    if (!user) {
+      throw new Error("No user found");
     }
     req.user = user;
-    next();}
-    catch(err){
-        res.status(400).send("Error: " + err.message);
-    }
-}
+    next();
+  } catch (err) {
+    res.status(400).send("Error: " + err.message);
+  }
+};
 
-
-
-module.exports = { userAuth,};
+module.exports = { userAuth };
